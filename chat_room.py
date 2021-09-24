@@ -30,7 +30,7 @@ class ChatRoom:
                                  height=self.dpg.get_viewport_height() * 0.75,
                                  width=self.dpg.get_viewport_width() * 0.75):
 
-                # todo: find a way to dynamically add input fields to display connected users
+                # todo: find a way to dynamically add input fields to display messages
                 self.dpg.add_input_text(label="Dummy Chat Box")
 
             # Child 3: Input Box
@@ -38,6 +38,5 @@ class ChatRoom:
                                  id=CHAT_INPT_ID,
                                  height=self.dpg.get_viewport_height() * 0.25,
                                  width=self.dpg.get_viewport_width() * 0.75):
-
-                # todo: find a way to dynamically add input fields to display connected users
+                
                 self.dpg.add_input_text(label="Dummy Input Box")
