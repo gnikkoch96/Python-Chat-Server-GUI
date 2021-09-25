@@ -14,4 +14,5 @@ def create_window():
     dpg.start_dearpygui()
 
 if __name__ == "__main__":
+    dpg.show_style_editor()
     create_window()
