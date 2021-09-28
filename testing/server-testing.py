@@ -18,7 +18,7 @@ server.bind(ADDR)  # binds the ip to the port
 def handle_client(conn, addr):
     # if the client disconnects, we also want the server to know that said user is disconnected
 
-    print(f"f[NEW CONNECTION] {addr} connected.")
+    print(f"[NEW CONNECTION] {addr} connected.")
 
     connected = True
     while connected:
