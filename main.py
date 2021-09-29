@@ -5,6 +5,7 @@ from nameconfig import NameConfig
 VIEWPORT_HEIGHT = 700
 VIEWPORT_WIDTH = 1000
 
+
 def create_window():
     dpg.setup_viewport()
     dpg.set_viewport_title("(DearPyGUI) Chat Room")
@@ -13,6 +14,7 @@ def create_window():
     NameConfig(dpg)
     dpg.start_dearpygui()
 
+
 if __name__ == "__main__":
-    dpg.show_style_editor()
     create_window()
+    print("Main Thread Ended")

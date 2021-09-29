@@ -5,7 +5,7 @@ import threading
 
 # server configurations
 HEADER = 64  # contains the length of the actual message
-PORT = 49955  # this is the port that the server will listen to for clients
+PORT = 49950  # this is the port that the server will listen to for clients
 SERVER_IP = socket.gethostbyname(socket.gethostname())  # gets the local ipv4 address
 ADDR = (SERVER_IP, PORT)  # represents the server address
 FORMAT = 'utf-8'  # used to encode messages to bytes and used for decoding back to string
@@ -24,7 +24,13 @@ list_of_clients = []
 
 def client_thread(conn, addr):
     # sends message to incoming user
-    # conn.send("Welcome to the chatroom!")
+    # todo: make this better
+    welcome_msg = "[SERVER] Welcome to the chatroom!".encode(FORMAT)
+    welcome_msg_len_info = len(welcome_msg)
+    welcome_msg_len = str(welcome_msg_len_info).encode(FORMAT)
+    welcome_msg_len += b' ' * (HEADER - len(welcome_msg_len))
+    conn.send(welcome_msg_len)
+    conn.send(welcome_msg)
 
     user_connected = True
     while user_connected:
@@ -46,6 +52,7 @@ def client_thread(conn, addr):
 
             else:
                 broadcast_user_message(msg, conn)
+                print(f"{addr} {msg}")
 
 
 # broadcasts the message to all users except for the one sending it
@@ -53,7 +60,13 @@ def broadcast_user_message(message, connection):
     for clients in list_of_clients:
         if clients != connection:
             try:
-                clients.send(message)
+                msg = message.encode(FORMAT)
+                msg_len_info = len(msg)
+                msg_len = str(msg_len_info).encode(FORMAT)
+                msg_len += b' ' * (HEADER - len(msg_len))
+
+                clients.send(msg_len)
+                clients.send(msg)
             except:
                 clients.close()
 
