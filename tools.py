@@ -22,3 +22,15 @@ class Tools:
             return dpg.add_image(texture_id)
         else:
             return dpg.add_image(texture_id, parent=parent)
+
+    @staticmethod
+    # msg - message to be sent
+    # header - the size of the header that contains info about the message length
+    # msg_format - utf-8
+    def format_msg_send(msg, header, msg_format):
+        send_msg = msg.encode(msg_format)
+        send_msg_len_info = len(send_msg)
+        send_msg_len = str(send_msg_len_info).encode(msg_format)
+        send_msg_len += b' ' * (header - len(send_msg_len))  # pads the header
+
+        return send_msg, send_msg_len

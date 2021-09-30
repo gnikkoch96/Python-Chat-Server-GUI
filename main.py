@@ -3,7 +3,7 @@ from nameconfig import NameConfig
 
 # static vars
 VIEWPORT_HEIGHT = 700
-VIEWPORT_WIDTH = 1000
+VIEWPORT_WIDTH = 1100
 
 
 def create_window():
