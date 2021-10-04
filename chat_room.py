@@ -52,8 +52,6 @@ class ChatRoom:
         rcv_thread = threading.Thread(target=self.rcv_msg)
         rcv_thread.start()
 
-
-
     def rcv_msg(self):
         # receive any messages sent to it by the server
         while self.isRunning:
@@ -68,6 +66,14 @@ class ChatRoom:
                         msg = self.client.recv(msg_len).decode(FORMAT)
                         if msg == GET_USERNAME_MESSAGE:
                             self.send_msg(self.username)
+                        elif msg[0:6] == "[USER]":
+                            self.dpg.add_text(parent=ONLINE_LST_ID,
+                                              default_value=msg[6:],
+                                              id=msg[6:])
+                        elif msg[0:12] == "[DISCONNECT]":
+                            print(msg[12:msg.index("disconnected")])
+                            self.dpg.delete_item(msg[12:msg.index("disconnected")])
+
                         else:
                             # update to gui (checks to see if the gui has been updated properly)
                             self.dpg.add_text(parent=CHAT_BOX_ID,
@@ -90,6 +96,13 @@ class ChatRoom:
         # closes the client's socket when the app is closed
         self.client.close()
         exit(0)
+
+    def listen_to_keys(self):
+        while self.isRunning:
+            if self.dpg.is_key_pressed(self.dpg.mvKey_Return) and self.dpg.is_item_focused(CHAT_INPT_ID):
+                if not Tools.isBlank(self.dpg.get_value(CHAT_INPT_ID)):
+                    self.send()
+                    self.dpg.focus_item(CHAT_INPT_ID)  # reassigns focus back to the chat input field
 
     # this method is used when we want to send the message from the input field
     def send(self):
@@ -117,6 +130,7 @@ class ChatRoom:
         # send dc message to the server
         self.send_msg(DISCONNECT_MESSAGE)
 
+        # todo: figure out a way to store the default values so you don't have to hardcode them
         self.dpg.set_viewport_height(700)
         self.dpg.set_viewport_width(1100)
 
@@ -172,9 +186,3 @@ class ChatRoom:
                                         id=SEND_BTN_ID,
                                         callback=self.send)
 
-    def listen_to_keys(self):
-        while self.isRunning:
-            if self.dpg.is_key_pressed(self.dpg.mvKey_Return) and self.dpg.is_item_focused(CHAT_INPT_ID):
-                if not Tools.isBlank(self.dpg.get_value(CHAT_INPT_ID)):
-                    self.send()
-                    self.dpg.focus_item(CHAT_INPT_ID)  # reassigns focus back to the chat input field

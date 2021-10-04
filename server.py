@@ -23,19 +23,43 @@ print(f"[LISTENING] Server is listening on {SERVER_IP}")
 
 # holds client sockets
 list_of_clients = []
+list_of_users = []
 
 
 def client_thread(conn, addr):
     # sends message to incoming user
     # todo: make this better
+    global username
     welcome_msg, welcome_msg_len = Tools.format_msg_send("[SERVER] Welcome to the chatroom! Please be respectful =]",
                                                          HEADER, FORMAT)
     conn.send(welcome_msg_len)
     conn.send(welcome_msg)
 
     user_connected = True
+    introduced_user = False
     while user_connected:
         try:
+            if not introduced_user:
+                # grabs the username
+                get_user_msg, get_user_msg_len = Tools.format_msg_send(GET_USERNAME_MESSAGE, HEADER, FORMAT)
+                conn.send(get_user_msg_len)
+                conn.send(get_user_msg)
+                username_len_info = conn.recv(HEADER).decode(FORMAT)
+                if username_len_info:  # checks to see if message is null
+                    username_len = int(float(username_len_info))
+                    username = conn.recv(username_len).decode(FORMAT)
+
+                list_of_users.append(username)
+
+                # notify all users that this user has connected
+                dc_msg = f"[CONNECTED] {username} connected to server"
+                broadcast_user_message(dc_msg, conn)
+
+                # send the user to everyone except the client
+                broadcast_user_message(f"[USER]{username}", conn)
+
+                introduced_user = True
+
             msg_len_info = conn.recv(HEADER).decode(FORMAT)
             if msg_len_info:  # checks to see if message is null
                 msg_len = int(float(msg_len_info))
@@ -45,18 +69,9 @@ def client_thread(conn, addr):
                     # disconnect user
                     user_connected = False
 
-                    # grabs the username
-                    get_user_msg, get_user_msg_len = Tools.format_msg_send(GET_USERNAME_MESSAGE, HEADER, FORMAT)
-                    conn.send(get_user_msg_len)
-                    conn.send(get_user_msg)
-                    username_len_info = conn.recv(HEADER).decode(FORMAT)
-                    if username_len_info:  # checks to see if message is null
-                        username_len = int(float(username_len_info))
-                        username = conn.recv(username_len).decode(FORMAT)
-
-                        # notify all users that this user has disconnected
-                        dc_msg = f"[DISCONNECT] {username} disconnected from server"
-                        broadcast_user_message(dc_msg, conn)
+                    # notify all users that this user has disconnected
+                    dc_msg = f"[DISCONNECT] {username} disconnected from server"
+                    broadcast_user_message(dc_msg, conn)
                 else:
                     broadcast_user_message(msg, conn)
                     print(f"{addr} {msg}")
@@ -64,6 +79,7 @@ def client_thread(conn, addr):
         except ConnectionResetError:
             user_connected = False
             print(f"[DISCONNECT] {addr} disconnected from server")
+
 
 # broadcasts the message to all users except for the one sending it
 def broadcast_user_message(message, connection):
