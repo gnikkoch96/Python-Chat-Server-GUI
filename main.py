@@ -4,10 +4,12 @@ from nameconfig import NameConfig
 # static vars
 VIEWPORT_HEIGHT = 700
 VIEWPORT_WIDTH = 1100
+VIEWPORT_TITLE = "(DearPyGUI) Chat Room"
+
 
 def create_window():
     dpg.setup_viewport()
-    dpg.set_viewport_title("(DearPyGUI) Chat Room")
+    dpg.set_viewport_title(VIEWPORT_TITLE)
     dpg.set_viewport_height(VIEWPORT_HEIGHT)
     dpg.set_viewport_width(VIEWPORT_WIDTH)
 
@@ -17,12 +19,15 @@ def create_window():
     # adding default themes
     create_dpg_themes()
 
+    # creates the name settings window
     NameConfig(dpg)
     dpg.start_dearpygui()
+
 
 def create_dpg_fonts():
     with dpg.font_registry():
         dpg.add_font("resources/fonts/Neon.ttf", 20, default_font=True)
+
 
 def create_dpg_themes():
     with dpg.theme(default_theme=True):
@@ -35,6 +40,5 @@ def create_dpg_themes():
 
 
 if __name__ == "__main__":
-    # dpg.show_style_editor()
     create_window()
-    print("Main Thread Ended")
+    # print("Main Thread Ended")

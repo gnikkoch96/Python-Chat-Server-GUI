@@ -1,5 +1,3 @@
-
-
 class Tools:
     @staticmethod
     def add_padding(dpg, width_value=0, height_value=0, is_same_line=False):

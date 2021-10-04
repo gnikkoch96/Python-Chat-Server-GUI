@@ -7,13 +7,13 @@ import sys, traceback
 # dearpygui related
 NEW_VIEWPORT_HEIGHT = 1000
 NEW_VIEWPORT_WIDTH = 1300
+WORD_WRAP_CNT = 850
 CHAT_ROOM_ID = "Chat Room"
 CHAT_BOX_ID = "Chat Box"
 CHAT_INPT_BOX_ID = " Chat Input Box"
 CHAT_INPT_ID = "Chat Input"
 SEND_BTN_ID = "Send Button"
 ONLINE_LST_ID = "Online List"
-WORD_WRAP_CNT = 850
 
 # playsound module
 SOUND_PATH = "resources/sounds/notification.wav"
@@ -29,12 +29,11 @@ CLIENT_IP = socket.gethostbyname(socket.gethostname())
 CLIENT_ADDR = (CLIENT_IP, PORT)
 
 
-# this is the client app
 class ChatRoom:
     def __init__(self, dpg, username):
-        # create client socket
+        # create client socket and connect to the server
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client.connect(CLIENT_ADDR)  # connects to server
+        self.client.connect(CLIENT_ADDR)
 
         self.dpg = dpg
         self.username = username
@@ -44,10 +43,6 @@ class ChatRoom:
         self.dpg.set_primary_window(CHAT_ROOM_ID, True)
         self.isRunning = True
 
-        # thread to update the connected users thread
-        connected_users_thread = threading.Thread(target=self.update_connected_users)
-        connected_users_thread.start()
-
         # thread to listen to key presses
         key_listener_thread = threading.Thread(target=self.listen_to_keys)
         key_listener_thread.start()
@@ -56,11 +51,7 @@ class ChatRoom:
         rcv_thread = threading.Thread(target=self.rcv_msg)
         rcv_thread.start()
 
-    def update_connected_users(self):
-        pass
-    
     def rcv_msg(self):
-        # receive any messages sent to it by the server
         while self.isRunning:
             if not self.dpg.is_dearpygui_running():
                 # closes everything when user closes the client app
@@ -74,7 +65,7 @@ class ChatRoom:
                         if msg == GET_USERNAME_MESSAGE:
                             self.send_msg(self.username)
                         else:
-                            # update to gui (checks to see if the gui has been updated properly)
+                            # update to gui
                             self.dpg.add_text(parent=CHAT_BOX_ID,
                                               default_value=msg,
                                               wrap=WORD_WRAP_CNT)
@@ -89,14 +80,21 @@ class ChatRoom:
                         print("-" * 60)
                         traceback.print_exc(file=sys.stdout)
                         print("-" * 60)
-                        self.client.close()
                         break
 
         # closes the client's socket when the app is closed
         self.client.close()
         exit(0)
 
-    # this method is used when we want to send the message from the input field
+    def listen_to_keys(self):
+        while self.isRunning:
+            if self.dpg.is_key_pressed(self.dpg.mvKey_Return) and self.dpg.is_item_focused(CHAT_INPT_ID):
+                if not Tools.isBlank(self.dpg.get_value(CHAT_INPT_ID)):
+                    self.send()
+
+                    # reassigns focus back to the chat input field
+                    self.dpg.focus_item(CHAT_INPT_ID)
+
     def send(self):
         msg = f"{self.username} : {self.dpg.get_value(CHAT_INPT_ID)}"
 
@@ -104,17 +102,15 @@ class ChatRoom:
                           default_value=msg,
                           wrap=WORD_WRAP_CNT)
 
+        # resets the input field
         self.dpg.set_value(CHAT_INPT_ID, "")
 
-        user_msg, usr_msg_len = Tools.format_msg_send(msg, HEADER, FORMAT)
-        self.client.send(usr_msg_len)
-        self.client.send(user_msg)
+        self.send_msg(msg)
 
-    # this method is used when a specific message is sent like DISCONNECT_MESSAGE or GET_USERNAME_MESSAGE
     def send_msg(self, msg):
-        user_msg, usr_msg_len = Tools.format_msg_send(msg, HEADER, FORMAT)
+        usr_msg, usr_msg_len = Tools.format_msg_send(msg, HEADER, FORMAT)
         self.client.send(usr_msg_len)
-        self.client.send(user_msg)
+        self.client.send(usr_msg)
 
     def exit_callback(self):
         self.isRunning = False
@@ -131,55 +127,51 @@ class ChatRoom:
     # front-end (gui portion)
     def create_chat_room_win(self):
         # Chat Room Window
-        # todo: adjust the height and width of the chat room
-        with self.dpg.window(label="Chat Room",
-                             id=CHAT_ROOM_ID,
+        with self.dpg.window(id=CHAT_ROOM_ID,
                              height=self.dpg.get_viewport_height(),
                              width=self.dpg.get_viewport_width()):
             chat_rm_height = self.dpg.get_viewport_configuration(CHAT_ROOM_ID).get('height')
             chat_rm_width = self.dpg.get_viewport_configuration(CHAT_ROOM_ID).get('width')
 
+            # Menu
             with self.dpg.menu_bar():
                 self.dpg.add_menu_item(label="Exit",
                                        callback=self.exit_callback)
 
-            # Child 1: Online List (who is connected)
+            # Child 1: Online List
             with self.dpg.child(label="Online List",
                                 id=ONLINE_LST_ID,
                                 height=chat_rm_height * 0.85,
                                 width=chat_rm_width * 0.15):
                 self.dpg.add_text(default_value="Connected Users")
 
+            # Child 2: Chat Container
             self.dpg.add_same_line()
-            with self.dpg.child(label="Chat Container",
-                                height=chat_rm_height * 0.85,
+            with self.dpg.child(height=chat_rm_height * 0.85,
                                 width=chat_rm_width * 0.80):
                 child_container_height = chat_rm_height
                 child_container_width = chat_rm_width * 0.95
 
-                # Child 2: Chat Box
+                # Sub-Child 1: Chat Box
                 with self.dpg.child(label="Chat Box",
                                     id=CHAT_BOX_ID,
                                     height=child_container_height * 0.70,
                                     width=child_container_width * 0.80):
                     self.dpg.set_y_scroll(CHAT_BOX_ID, 1000)
 
-                # Child 3: Input Box
+                # Sub-Child 2: Input Box
                 Tools.add_padding(self.dpg, 0, 15, False)
                 with self.dpg.child(id=CHAT_INPT_BOX_ID,
                                     height=child_container_height * 0.10,
                                     width=child_container_width * 0.80):
+
+                    # Input Field
                     Tools.add_padding(self.dpg, 75, 25, True)
                     self.dpg.add_input_text(id=CHAT_INPT_ID,
                                             width=725)
+
+                    # Send Button
                     self.dpg.add_same_line()
                     self.dpg.add_button(label="Send",
                                         id=SEND_BTN_ID,
                                         callback=self.send)
-
-    def listen_to_keys(self):
-        while self.isRunning:
-            if self.dpg.is_key_pressed(self.dpg.mvKey_Return) and self.dpg.is_item_focused(CHAT_INPT_ID):
-                if not Tools.isBlank(self.dpg.get_value(CHAT_INPT_ID)):
-                    self.send()
-                    self.dpg.focus_item(CHAT_INPT_ID)  # reassigns focus back to the chat input field

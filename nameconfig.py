@@ -1,9 +1,12 @@
 from chat_room import ChatRoom
 from tools import Tools
 
+# static vars
 NAME_SETTINGS_ID = "Name-Settings"
 NAME_INPUT_ID = "Nickname"
 JOIN_CHAT_BUTTON_ID = "Join Chat Room"
+BANNER_IMG_PATH = "resources/imgs/banner.png"
+JOIN_BUTTON_MSG = "Enter the Chatroom (Note: Make sure username is not empty)"
 
 
 class NameConfig:
@@ -11,14 +14,14 @@ class NameConfig:
         self.dpg = dpg
 
         # Name-Settings Window
-        with self.dpg.window(label="Chatroom Settings",
-                             id=NAME_SETTINGS_ID,
+        with self.dpg.window(id=NAME_SETTINGS_ID,
                              height=self.dpg.get_viewport_height(),
                              width=self.dpg.get_viewport_width(),
                              no_resize=True):
 
+            # Display Banner Image
             Tools.add_padding(self.dpg, 50, 50, True)
-            Tools.add_and_load_image(self.dpg, 'resources/imgs/banner.png')
+            Tools.add_and_load_image(self.dpg, BANNER_IMG_PATH)
 
             # Enter Name Input Field
             Tools.add_padding(self.dpg, 100, 50, True)
@@ -33,13 +36,14 @@ class NameConfig:
                                 callback=self.join_btn_callback)
 
             with self.dpg.tooltip(JOIN_CHAT_BUTTON_ID):
-                self.dpg.add_text("Enter the Chatroom (Note: Make sure username is not empty)")
+                self.dpg.add_text(JOIN_BUTTON_MSG)
 
         self.dpg.set_primary_window(NAME_SETTINGS_ID, True)
 
     def join_btn_callback(self):
         username = self.dpg.get_value(NAME_INPUT_ID)
 
+        # checks that the user created a username before entering chatroom
         if not Tools.isBlank(username):
             # hide this window
             self.dpg.hide_item(NAME_SETTINGS_ID)
