@@ -44,10 +44,6 @@ class ChatRoom:
         self.dpg.set_primary_window(CHAT_ROOM_ID, True)
         self.isRunning = True
 
-        # thread to update the connected users thread
-        connected_users_thread = threading.Thread(target=self.update_connected_users)
-        connected_users_thread.start()
-
         # thread to listen to key presses
         key_listener_thread = threading.Thread(target=self.listen_to_keys)
         key_listener_thread.start()
@@ -56,9 +52,8 @@ class ChatRoom:
         rcv_thread = threading.Thread(target=self.rcv_msg)
         rcv_thread.start()
 
-    def update_connected_users(self):
-        pass
-    
+
+
     def rcv_msg(self):
         # receive any messages sent to it by the server
         while self.isRunning:
