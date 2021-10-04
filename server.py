@@ -27,30 +27,28 @@ list_of_clients = []
 
 def client_thread(conn, addr):
     # sends a welcome message to incoming users
-    global username
     welcome_msg, welcome_msg_len = Tools.format_msg_send("[SERVER] Welcome to the chatroom! Please be respectful =]",
                                                          HEADER, FORMAT)
     conn.send(welcome_msg_len)
     conn.send(welcome_msg)
 
     user_connected = True
-    introduced_user = False
+
+    # grabs the username
+    username = ''
+    get_user_msg, get_user_msg_len = Tools.format_msg_send(GET_USERNAME_MESSAGE, HEADER, FORMAT)
+    conn.send(get_user_msg_len)
+    conn.send(get_user_msg)
+    username_len_info = conn.recv(HEADER).decode(FORMAT)
+    if username_len_info:
+        username_len = int(float(username_len_info))
+        username = conn.recv(username_len).decode(FORMAT)
+
+    # notify all users that this user has disconnected
+    msg = f"[CONNECT] {username} connected to server"
+    broadcast_user_message(msg, conn)
+
     while user_connected:
-        if not introduced_user:
-            # grabs the username
-            get_user_msg, get_user_msg_len = Tools.format_msg_send(GET_USERNAME_MESSAGE, HEADER, FORMAT)
-            conn.send(get_user_msg_len)
-            conn.send(get_user_msg)
-            username_len_info = conn.recv(HEADER).decode(FORMAT)
-            if username_len_info:
-                username_len = int(float(username_len_info))
-                username = conn.recv(username_len).decode(FORMAT)
-
-            # notify all users that this user has disconnected
-            msg = f"[CONNECT] {username} connected to server"
-            broadcast_user_message(msg, conn)
-
-            introduced_user = True
         try:
             msg_len_info = conn.recv(HEADER).decode(FORMAT)
             if msg_len_info:
@@ -62,6 +60,7 @@ def client_thread(conn, addr):
                     user_connected = False
 
                     # notify all users that this user has disconnected
+                    list_of_clients.remove(conn)
                     msg = f"[DISCONNECT] {username} disconnected from server"
 
                 broadcast_user_message(msg, conn)
@@ -83,8 +82,6 @@ def broadcast_user_message(message, connection):
             except:
                 clients.close()
 
-
-# main
 while True:
     print("[WAITING] server is waiting for new users...")
 

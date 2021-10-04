@@ -3,10 +3,11 @@ import socket
 from playsound import playsound
 import threading
 import sys, traceback
+import nameconfig
 
 # dearpygui related
-NEW_VIEWPORT_HEIGHT = 1000
-NEW_VIEWPORT_WIDTH = 1300
+NEW_VIEWPORT_HEIGHT = 875
+NEW_VIEWPORT_WIDTH = 1200
 WORD_WRAP_CNT = 850
 CHAT_ROOM_ID = "Chat Room"
 CHAT_BOX_ID = "Chat Box"
@@ -63,7 +64,7 @@ class ChatRoom:
                         msg_len = int(float(msg_len_info))
                         msg = self.client.recv(msg_len).decode(FORMAT)
                         if msg == GET_USERNAME_MESSAGE:
-                            self.send_msg(self.username)
+                            self.send_msg(str(self.username))
                         else:
                             # update to gui
                             self.dpg.add_text(parent=CHAT_BOX_ID,
@@ -121,15 +122,16 @@ class ChatRoom:
         self.dpg.set_viewport_height(700)
         self.dpg.set_viewport_width(1100)
 
-        self.dpg.show_item("Name-Settings")
+        # user returns to NameConfig gui
         self.dpg.delete_item(CHAT_ROOM_ID)
+        nameconfig.NameConfig(self.dpg)
 
     # front-end (gui portion)
     def create_chat_room_win(self):
         # Chat Room Window
         with self.dpg.window(id=CHAT_ROOM_ID,
-                             height=self.dpg.get_viewport_height(),
-                             width=self.dpg.get_viewport_width()):
+                             height=NEW_VIEWPORT_HEIGHT,
+                             width=NEW_VIEWPORT_WIDTH):
             chat_rm_height = self.dpg.get_viewport_configuration(CHAT_ROOM_ID).get('height')
             chat_rm_width = self.dpg.get_viewport_configuration(CHAT_ROOM_ID).get('width')
 
@@ -164,9 +166,8 @@ class ChatRoom:
                 with self.dpg.child(id=CHAT_INPT_BOX_ID,
                                     height=child_container_height * 0.10,
                                     width=child_container_width * 0.80):
-
                     # Input Field
-                    Tools.add_padding(self.dpg, 75, 25, True)
+                    Tools.add_padding(self.dpg, 35, 15, True)
                     self.dpg.add_input_text(id=CHAT_INPT_ID,
                                             width=725)
 

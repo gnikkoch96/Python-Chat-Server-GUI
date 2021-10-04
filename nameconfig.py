@@ -45,10 +45,10 @@ class NameConfig:
 
         # checks that the user created a username before entering chatroom
         if not Tools.isBlank(username):
-            # hide this window
-            self.dpg.hide_item(NAME_SETTINGS_ID)
+            # deletes this window
+            self.dpg.delete_item(NAME_SETTINGS_ID)
 
             # load chat room
-            ChatRoom(self.dpg, self.dpg.get_value(NAME_INPUT_ID))
+            ChatRoom(self.dpg, username)
 
 
