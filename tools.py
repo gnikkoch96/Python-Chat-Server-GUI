@@ -1,15 +1,16 @@
-# so far we can only add padding and add and load images
+
+
 class Tools:
     @staticmethod
     def add_padding(dpg, width_value=0, height_value=0, is_same_line=False):
-        if is_same_line:
-            dpg.add_same_line()
-
         if height_value != 0:
             dpg.add_dummy(height=height_value)
 
         if width_value != 0:
             dpg.add_dummy(width=width_value)
+
+        if is_same_line:
+            dpg.add_same_line()
 
     @staticmethod
     def add_and_load_image(dpg, image_path, parent=None):
@@ -34,3 +35,12 @@ class Tools:
         send_msg_len += b' ' * (header - len(send_msg_len))  # pads the header
 
         return send_msg, send_msg_len
+
+    @staticmethod
+    # checks if a string is blank and that it is not None type
+    def isBlank(myString):
+        if myString and myString.strip():
+            # myString is not None AND myString is not empty or blank
+            return False
+        # myString is None OR myString is empty or blank
+        return True

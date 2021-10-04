@@ -11,7 +11,8 @@ SERVER_IP = socket.gethostbyname(socket.gethostname())  # gets the local ipv4 ad
 ADDR = (SERVER_IP, PORT)  # represents the server address
 FORMAT = 'utf-8'  # used to encode messages to bytes and used for decoding back to string
 DISCONNECT_MESSAGE = "DISCONNECT_ME"
-GET_USERNAME_MESSAGE ="GET_USERNAME"
+DISCONNECT_SUCCESS = "DISCONNECT_SUCCESS"
+GET_USERNAME_MESSAGE = "GET_USERNAME"
 
 # create the server socket
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -27,42 +28,42 @@ list_of_clients = []
 def client_thread(conn, addr):
     # sends message to incoming user
     # todo: make this better
-    welcome_msg, welcome_msg_len = Tools.format_msg_send("[SERVER] Welcome to the chatroom!",
+    welcome_msg, welcome_msg_len = Tools.format_msg_send("[SERVER] Welcome to the chatroom! Please be respectful =]",
                                                          HEADER, FORMAT)
     conn.send(welcome_msg_len)
     conn.send(welcome_msg)
 
     user_connected = True
     while user_connected:
-        msg_len_info = conn.recv(HEADER).decode(FORMAT)
-        if msg_len_info:  # checks to see if message is null
-            msg_len = int(float(msg_len_info))
-            msg = conn.recv(msg_len).decode(FORMAT)
+        try:
+            msg_len_info = conn.recv(HEADER).decode(FORMAT)
+            if msg_len_info:  # checks to see if message is null
+                msg_len = int(float(msg_len_info))
+                msg = conn.recv(msg_len).decode(FORMAT)
 
-            # todo: I'm thinking that we can check to see if the user has ended their gui then disconnect them if they did
-            if msg == DISCONNECT_MESSAGE:
-                # disconnect user
-                user_connected = False
+                if msg == DISCONNECT_MESSAGE:
+                    # disconnect user
+                    user_connected = False
 
-                # grabs the username
-                get_user_msg, get_user_msg_len = Tools.format_msg_send(GET_USERNAME_MESSAGE, HEADER, FORMAT)
-                conn.send(get_user_msg_len)
-                conn.send(get_user_msg)
-                username_len_info = conn.recv(HEADER).decode(FORMAT)
-                if username_len_info:  # checks to see if message is null
-                    username_len = int(float(username_len_info))
-                    username = conn.recv(username_len).decode(FORMAT)
+                    # grabs the username
+                    get_user_msg, get_user_msg_len = Tools.format_msg_send(GET_USERNAME_MESSAGE, HEADER, FORMAT)
+                    conn.send(get_user_msg_len)
+                    conn.send(get_user_msg)
+                    username_len_info = conn.recv(HEADER).decode(FORMAT)
+                    if username_len_info:  # checks to see if message is null
+                        username_len = int(float(username_len_info))
+                        username = conn.recv(username_len).decode(FORMAT)
 
-                    # notify all users that this user has disconnected
-                    dc_msg = f"[DISCONNECT] {username} disconnected from server"
-                    broadcast_user_message(dc_msg, conn)
+                        # notify all users that this user has disconnected
+                        dc_msg = f"[DISCONNECT] {username} disconnected from server"
+                        broadcast_user_message(dc_msg, conn)
+                else:
+                    broadcast_user_message(msg, conn)
+                    print(f"{addr} {msg}")
 
-                print(f"[DISCONNECT] {addr} disconnected from server")
-
-            else:
-                broadcast_user_message(msg, conn)
-                print(f"{addr} {msg}")
-
+        except ConnectionResetError:
+            user_connected = False
+            print(f"[DISCONNECT] {addr} disconnected from server")
 
 # broadcasts the message to all users except for the one sending it
 def broadcast_user_message(message, connection):

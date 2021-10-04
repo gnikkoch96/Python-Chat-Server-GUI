@@ -1,4 +1,5 @@
 from chat_room import ChatRoom
+from tools import Tools
 
 NAME_SETTINGS_ID = "Name-Settings"
 NAME_INPUT_ID = "Nickname"
@@ -10,24 +11,40 @@ class NameConfig:
         self.dpg = dpg
 
         # Name-Settings Window
-        with self.dpg.window(label="Enter Name",
+        with self.dpg.window(label="Chatroom Settings",
                              id=NAME_SETTINGS_ID,
                              height=self.dpg.get_viewport_height(),
                              width=self.dpg.get_viewport_width(),
                              no_resize=True):
+
+            Tools.add_padding(self.dpg, 50, 50, True)
+            Tools.add_and_load_image(self.dpg, 'resources/imgs/banner.png')
+
             # Enter Name Input Field
-            self.dpg.add_input_text(label="Enter Nickname:",
-                                    id=NAME_INPUT_ID)
+            Tools.add_padding(self.dpg, 100, 50, True)
+            self.dpg.add_text("Username: ")
+            self.dpg.add_same_line()
+            self.dpg.add_input_text(id=NAME_INPUT_ID)
+
             # Join Chat Room Button
-            self.dpg.add_button(label="Join Chat Room!",
+            Tools.add_padding(self.dpg, 450, 50, True)
+            self.dpg.add_button(label="Enter Chat Room",
                                 id=JOIN_CHAT_BUTTON_ID,
                                 callback=self.join_btn_callback)
 
+            with self.dpg.tooltip(JOIN_CHAT_BUTTON_ID):
+                self.dpg.add_text("Enter the Chatroom (Note: Make sure username is not empty)")
+
+        self.dpg.set_primary_window(NAME_SETTINGS_ID, True)
+
     def join_btn_callback(self):
-        # todo: check to see if there is text in the name input field, if not then the user can not join the room w/out a name
+        username = self.dpg.get_value(NAME_INPUT_ID)
 
-        # delete this window
-        self.dpg.hide_item(NAME_SETTINGS_ID)
+        if not Tools.isBlank(username):
+            # hide this window
+            self.dpg.hide_item(NAME_SETTINGS_ID)
 
-        # load chat room
-        ChatRoom(self.dpg, self.dpg.get_value(NAME_INPUT_ID))
+            # load chat room
+            ChatRoom(self.dpg, self.dpg.get_value(NAME_INPUT_ID))
+
+
