@@ -32,7 +32,7 @@
 <ol>
     <li> Make sure to have DearPyGUI and Playsound installed which can be found in the Technologies and Frameworks section</li>
     <li> Use a command console or git bash to execute the server.py (This needs to be running as it manages the connections and broadcasts the messages to other clients) </li>
-    <li> Using and IDE or a command console, execute the main.py and a GUI should pop up (Check out the demonstration section next on how to do the rest) </li>
+    <li> Using and IDE or a command console, execute the main.py and a GUI should pop up (Check out the <a href="https://github.com/gnikkoch96/Python-Chat-Server-GUI/blob/master/README.md#-demonstration-"> demonstration section </a> on how to do the rest) </li>
 </ol>
 
 <!-- Demonstration-->
