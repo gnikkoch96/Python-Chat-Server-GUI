@@ -11,18 +11,18 @@
 <p> The reason why I made this was to understand sockets better and trying to get used to the DearPyGUI framework. </p>
 
 <!-- 3. Describe how a Chatroom is made -->
-<p> The chatroom is made by having a server side and a client script. The server would be continuously listening to connections while the clients can enter at any point in time while the server is still running. It is very important to make sure that the client side connects to the right port or it won't work. Messages are sent in bytes so they needed to encoded and decoded by a format, in my case I used utf-8. </p>
+<p> The chatroom is made by having a server side and a client script. The server would be continuously listening to connections while the clients can enter at any point in time while the server is still running. It is very important to make sure that the client side connects to the right port or it won't work. Messages are sent in bytes so they need to be encoded and decoded by a format, in my case I used utf-8. </p>
 
 <!-- Technologies and Frameworks -->
 <h2> Technologies and Frameworks </h2>
-<p> Make sure to install the DearPyGUI and Playsound Modules for it to work. 
-    You can follow the installation to DearPyGUI <a href="https://github.com/hoffstadt/DearPyGui"> here </a>, and install Playsound <a href="https://pypi.org/project/playsound/"> here </a>.</p> 
+<p> Make sure to install the DearPyGUI and Playsound Modules for it to work. You can follow the installation to DearPyGUI <a href="https://github.com/hoffstadt/DearPyGui"> here </a>, and install Playsound <a href="https://pypi.org/project/playsound/"> here </a>.</p> 
+
 <p> You could always just do <i> pip install dearpygui </i> and <i> pip install playsound. </i> </p>
 
 <ul>
     <li><i>PyCharm IDE</i> - Environment </li>
     <li><i>DearPyGUI</i> - Framework used to create the GUI </li>
-    <li><i>Plasound</i> - Module used to allow sound to be played </li>
+    <li><i>Plasound</i> - Module used to allow sound to be played when receiving a message </li>
     <li><i>Python 3.8</i> - Python vers.</li>
 </ul>
   
@@ -31,8 +31,8 @@
 <h2> How to Setup </h2>
 <ol>
     <li> Make sure to have DearPyGUI and Playsound installed which can be found in the Technologies and Frameworks section</li>
-    <li> Use a command console or git bash to execute the server in the root folder (This needs to be running as it manages the connections and broadcasts the messages to other clients) </li>
-    <li> Using and IDE or a command console, execute the main.py and a GUI should pop up (Check out the demonstration on how to do the rest) </li>
+    <li> Use a command console or git bash to execute the server.py (This needs to be running as it manages the connections and broadcasts the messages to other clients) </li>
+    <li> Using and IDE or a command console, execute the main.py and a GUI should pop up (Check out the demonstration section next on how to do the rest) </li>
 </ol>
 
 <!-- Demonstration-->
