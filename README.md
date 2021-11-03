@@ -17,11 +17,11 @@
 <h2> Technologies and Frameworks </h2>
 <p> Make sure to install the DearPyGUI and Playsound Modules for it to work. You can follow the installation to DearPyGUI <a href="https://github.com/hoffstadt/DearPyGui"> here </a>, and install Playsound <a href="https://pypi.org/project/playsound/"> here </a>.</p> 
 
-<p> You could always just do <i> pip install dearpygui </i> and <i> pip install playsound. </i> </p>
+<p> You could always just do <i> pip install dearpygui==0.8.56 </i> and <i> pip install playsound. </i> </p>
 
 <ul>
     <li><i>PyCharm IDE</i> - Environment </li>
-    <li><i>DearPyGUI</i> - Framework used to create the GUI </li>
+    <li><i>DearPyGUI v0.8.56</i> - Framework used to create the GUI </li>
     <li><i>Plasound</i> - Module used to allow sound to be played when receiving a message </li>
     <li><i>Python 3.8</i> - Python vers.</li>
 </ul>
